@@ -12,10 +12,18 @@ A compose file may look something like the following, running it with `$ docker 
 ```yml
 watch:
   restart: always
-  image: QSmally/I-Notify-Bash
+  image: qsmally/i-notify-bash
   container_name: watch
   volumes:
     - "./tools:/tools:rw" # Injected files, e.g. a script
     - "./watch:/watch:ro" # A mounted directory to watch for inode changes
-  entrypoint: /bin/bash -c 'while inotifywait /watch -e create,delete; do echo "..." done'
+  entrypoint: /tools/watch.sh
+```
+
+`tools/watch.sh`:
+
+```bash
+#!/bin/bash
+inotifywait /watch -mq -e create -e delete --format='%f' |
+    while read -r FILE; do echo $FILE; done
 ```
