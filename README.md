@@ -24,6 +24,15 @@ watch:
 
 ```bash
 #!/bin/bash
+
+# Echo creation and deletion of files
 inotifywait /watch -mq -e create -e delete --format='%f' |
     while read -r FILE; do echo $FILE; done
+
+# Echo creation, deletion and modification of files with debounce
+inotifywait /watch -e create -e delete -e modify -mq --format '%f' |
+    while read -r FILE; do
+        echo "Skipping $(timeout 1 cat | wc -l) further changes to debounce filesystem events"
+        echo $FILE
+    done
 ```
